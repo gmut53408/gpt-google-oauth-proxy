@@ -1,0 +1,12 @@
+{
+  "name": "gpt-google-oauth-proxy",
+  "version": "1.0.0",
+  "description": "OAuth proxy for connecting ChatGPT to Google Workspace",
+  "type": "module",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
