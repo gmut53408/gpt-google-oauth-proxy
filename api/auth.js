@@ -30,3 +30,4 @@ export default async function handler(req, res) {
 
   res.redirect(url);
 }
+// Trigger redeploy Mon Nov 17 17:22:48 +04 2025
