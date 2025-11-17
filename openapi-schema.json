@@ -21,48 +21,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "command": {
-                    "type": "string",
-                    "description": "The operation to perform.",
-                    "enum": [
-                      "gmail_list",
-                      "gmail_get",
-                      "gmail_send",
-                      "gmail_delete",
-                      "drive_list",
-                      "drive_search",
-                      "drive_upload",
-                      "drive_download",
-                      "drive_delete",
-                      "docs_read",
-                      "docs_write",
-                      "sheets_read",
-                      "sheets_write",
-                      "sheets_append",
-                      "calendar_list",
-                      "calendar_create",
-                      "calendar_delete",
-                      "calendar_freebusy",
-                      "contacts_list",
-                      "contacts_create",
-                      "contacts_update",
-                      "contacts_delete",
-                      "forms_list",
-                      "forms_read",
-                      "forms_write",
-                      "userinfo_profile",
-                      "userinfo_email"
-                    ]
-                  },
-                  "parameters": {
-                    "type": "object",
-                    "description": "Command-specific parameters.",
-                    "additionalProperties": true
-                  }
-                },
-                "required": ["command"]
+                "$ref": "#/components/schemas/CommandRequest"
               }
             }
           }
@@ -73,15 +32,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "data": {
-                      "type": "object"
-                    }
-                  }
+                  "$ref": "#/components/schemas/CommandResponse"
                 }
               }
             }
@@ -97,6 +48,66 @@
     }
   },
   "components": {
+    "schemas": {
+      "CommandRequest": {
+        "type": "object",
+        "required": ["command"],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The operation to perform",
+            "enum": [
+              "gmail_list",
+              "gmail_get",
+              "gmail_send",
+              "gmail_delete",
+              "drive_list",
+              "drive_search",
+              "drive_upload",
+              "drive_download",
+              "drive_delete",
+              "docs_read",
+              "docs_write",
+              "sheets_read",
+              "sheets_write",
+              "sheets_append",
+              "calendar_list",
+              "calendar_create",
+              "calendar_delete",
+              "calendar_freebusy",
+              "contacts_list",
+              "contacts_create",
+              "contacts_update",
+              "contacts_delete",
+              "forms_list",
+              "forms_read",
+              "forms_write",
+              "userinfo_profile",
+              "userinfo_email"
+            ]
+          },
+          "parameters": {
+            "type": "object",
+            "description": "Command-specific parameters",
+            "additionalProperties": true
+          }
+        }
+      },
+      "CommandResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Whether the operation succeeded"
+          },
+          "data": {
+            "type": "object",
+            "description": "Response data from Google API",
+            "additionalProperties": true
+          }
+        }
+      }
+    },
     "securitySchemes": {
       "OAuth2": {
         "type": "oauth2",
