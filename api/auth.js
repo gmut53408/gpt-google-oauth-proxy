@@ -1,5 +1,3 @@
-import fetch from "node-fetch";
-
 export default async function handler(req, res) {
   const redirectUri = process.env.REDIRECT_URI;
   const clientId = process.env.CLIENT_ID;
@@ -30,4 +28,3 @@ export default async function handler(req, res) {
 
   res.redirect(url);
 }
-// Trigger redeploy Mon Nov 17 17:22:48 +04 2025
