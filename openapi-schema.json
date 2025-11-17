@@ -1,0 +1,143 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Google Workspace Unified Connector",
+    "version": "1.0.0",
+    "description": "Execute Gmail, Drive, Docs, Sheets, Calendar, Contacts, Forms operations through OAuth proxy"
+  },
+  "servers": [
+    {
+      "url": "https://gpt-google-oauth-proxy.vercel.app"
+    }
+  ],
+  "paths": {
+    "/api/googleConnector": {
+      "post": {
+        "operationId": "googleConnector",
+        "summary": "Unified Google Workspace command handler",
+        "description": "Execute Gmail, Drive, Docs, Sheets, Calendar, Contacts, Forms, and Userinfo operations.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string",
+                    "description": "The operation to perform.",
+                    "enum": [
+                      "gmail_list",
+                      "gmail_get",
+                      "gmail_send",
+                      "gmail_delete",
+                      "drive_list",
+                      "drive_search",
+                      "drive_upload",
+                      "drive_download",
+                      "drive_delete",
+                      "docs_read",
+                      "docs_write",
+                      "sheets_read",
+                      "sheets_write",
+                      "sheets_append",
+                      "calendar_list",
+                      "calendar_create",
+                      "calendar_delete",
+                      "calendar_freebusy",
+                      "contacts_list",
+                      "contacts_create",
+                      "contacts_update",
+                      "contacts_delete",
+                      "forms_list",
+                      "forms_read",
+                      "forms_write",
+                      "userinfo_profile",
+                      "userinfo_email"
+                    ]
+                  },
+                  "parameters": {
+                    "type": "object",
+                    "description": "Command-specific parameters.",
+                    "additionalProperties": true
+                  }
+                },
+                "required": ["command"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful execution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "OAuth2": {
+        "type": "oauth2",
+        "description": "Google OAuth 2.0 Workspace Access via Vercel Proxy",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://gpt-google-oauth-proxy.vercel.app/api/auth",
+            "tokenUrl": "https://gpt-google-oauth-proxy.vercel.app/api/token",
+            "scopes": {
+              "openid": "OpenID identity",
+              "https://mail.google.com/": "Full Gmail access",
+              "https://www.googleapis.com/auth/gmail.readonly": "Read Gmail",
+              "https://www.googleapis.com/auth/gmail.modify": "Modify Gmail",
+              "https://www.googleapis.com/auth/gmail.send": "Send Gmail",
+              "https://www.googleapis.com/auth/gmail.compose": "Compose Gmail",
+              "https://www.googleapis.com/auth/drive": "Full Drive access",
+              "https://www.googleapis.com/auth/drive.readonly": "Read Drive",
+              "https://www.googleapis.com/auth/drive.metadata.readonly": "Read Drive metadata",
+              "https://www.googleapis.com/auth/drive.file": "Access app-created Drive files",
+              "https://www.googleapis.com/auth/documents": "Read/write Docs",
+              "https://www.googleapis.com/auth/documents.readonly": "Read Docs",
+              "https://www.googleapis.com/auth/spreadsheets": "Read/write Sheets",
+              "https://www.googleapis.com/auth/calendar": "Full Calendar access",
+              "https://www.googleapis.com/auth/calendar.events": "Manage events",
+              "https://www.googleapis.com/auth/calendar.readonly": "Read calendars",
+              "https://www.googleapis.com/auth/calendar.events.owned": "Manage owned events",
+              "https://www.googleapis.com/auth/contacts": "Manage contacts",
+              "https://www.googleapis.com/auth/contacts.readonly": "Read contacts",
+              "https://www.googleapis.com/auth/forms.body": "Manage Google Forms",
+              "https://www.googleapis.com/auth/forms.responses.readonly": "Read form responses",
+              "https://www.googleapis.com/auth/userinfo.email": "User email",
+              "https://www.googleapis.com/auth/userinfo.profile": "User profile"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "OAuth2": []
+    }
+  ]
+}
