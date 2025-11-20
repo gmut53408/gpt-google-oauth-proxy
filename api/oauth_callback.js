@@ -8,10 +8,6 @@ export default async function handler(req, res) {
   // Handle OAuth errors
   if (error) {
     console.error("OAuth error:", error);
-    // Redirect back to ChatGPT with error and state
-    if (state) {
-      return res.redirect(`https://chatgpt.com/gpts/editor/${state}?error=${encodeURIComponent(error)}`);
-    }
     return res.status(400).send(`OAuth error: ${error}. You can close this window.`);
   }
 
@@ -20,18 +16,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Redirect back to ChatGPT with the authorization code and state
-    // ChatGPT will exchange the code for tokens itself using the token endpoint
-    if (state) {
-      // The state parameter should contain just the GPT ID (without g- prefix)
-      // ChatGPT callback URL format: https://chat.openai.com/aip/{GPT_ID}/oauth/callback
-      const callbackUrl = `https://chat.openai.com/aip/${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
-      console.log("OAuth callback - State received:", state);
-      console.log("Redirecting to ChatGPT callback:", callbackUrl);
-      return res.redirect(callbackUrl);
-    }
-
-    // If no state (not from ChatGPT), exchange tokens ourselves for testing
+    // Exchange authorization code for tokens
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -51,7 +36,13 @@ export default async function handler(req, res) {
       return res.status(500).send(`Token exchange failed: ${tokens.error || "Unknown error"}. You can close this window.`);
     }
 
-    // Fallback for direct browser testing (no state from ChatGPT)
+    console.log("OAuth success - tokens obtained", { 
+      hasAccessToken: !!tokens.access_token, 
+      hasRefreshToken: !!tokens.refresh_token,
+      state: state 
+    });
+
+    // Show success page (works for both ChatGPT and direct browser testing)
     res.send(`
       <!DOCTYPE html>
       <html>
