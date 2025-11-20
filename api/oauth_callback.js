@@ -23,8 +23,10 @@ export default async function handler(req, res) {
     // Redirect back to ChatGPT with the authorization code and state
     // ChatGPT will exchange the code for tokens itself using the token endpoint
     if (state) {
-      // The state parameter contains the full GPT ID
-      const callbackUrl = `https://chat.openai.com/aip/g-${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+      // The state parameter should contain just the GPT ID (without g- prefix)
+      // ChatGPT callback URL format: https://chat.openai.com/aip/{GPT_ID}/oauth/callback
+      const callbackUrl = `https://chat.openai.com/aip/${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+      console.log("OAuth callback - State received:", state);
       console.log("Redirecting to ChatGPT callback:", callbackUrl);
       return res.redirect(callbackUrl);
     }
