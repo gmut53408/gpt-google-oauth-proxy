@@ -20,7 +20,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Exchange authorization code for tokens
+    // Redirect back to ChatGPT with the authorization code and state
+    // ChatGPT will exchange the code for tokens itself using the token endpoint
+    if (state) {
+      // The state parameter contains the full GPT ID
+      const callbackUrl = `https://chat.openai.com/aip/g-${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+      console.log("Redirecting to ChatGPT callback:", callbackUrl);
+      return res.redirect(callbackUrl);
+    }
+
+    // If no state (not from ChatGPT), exchange tokens ourselves for testing
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -37,18 +46,7 @@ export default async function handler(req, res) {
 
     if (!tokenRes.ok) {
       console.error("Token exchange failed:", tokens);
-      // Redirect back to ChatGPT with error and state
-      if (state) {
-        return res.redirect(`https://chatgpt.com/gpts/editor/${state}?error=token_exchange_failed`);
-      }
       return res.status(500).send(`Token exchange failed: ${tokens.error || "Unknown error"}. You can close this window.`);
-    }
-
-    // Redirect back to ChatGPT with the authorization code and state
-    // ChatGPT will exchange the code for tokens itself
-    if (state) {
-      const callbackUrl = `https://chatgpt.com/aip/g-${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
-      return res.redirect(callbackUrl);
     }
 
     // Fallback for direct browser testing (no state from ChatGPT)
