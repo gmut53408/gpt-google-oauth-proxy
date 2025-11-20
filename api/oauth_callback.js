@@ -2,11 +2,16 @@ import fetch from "node-fetch";
 
 export default async function handler(req, res) {
   const code = req.query.code;
+  const state = req.query.state;
   const error = req.query.error;
 
   // Handle OAuth errors
   if (error) {
     console.error("OAuth error:", error);
+    // Redirect back to ChatGPT with error and state
+    if (state) {
+      return res.redirect(`https://chatgpt.com/gpts/editor/${state}?error=${encodeURIComponent(error)}`);
+    }
     return res.status(400).send(`OAuth error: ${error}. You can close this window.`);
   }
 
@@ -32,22 +37,21 @@ export default async function handler(req, res) {
 
     if (!tokenRes.ok) {
       console.error("Token exchange failed:", tokens);
+      // Redirect back to ChatGPT with error and state
+      if (state) {
+        return res.redirect(`https://chatgpt.com/gpts/editor/${state}?error=token_exchange_failed`);
+      }
       return res.status(500).send(`Token exchange failed: ${tokens.error || "Unknown error"}. You can close this window.`);
     }
 
-    // Forward tokens to ChatGPT callback URL
-    const chatgptCallbackUrl = process.env.CHATGPT_CALLBACK_URL;
-    
-    if (chatgptCallbackUrl) {
-      await fetch(chatgptCallbackUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tokens)
-      });
-    } else {
-      console.warn("CHATGPT_CALLBACK_URL not set, tokens not forwarded");
+    // Redirect back to ChatGPT with the authorization code and state
+    // ChatGPT will exchange the code for tokens itself
+    if (state) {
+      const callbackUrl = `https://chatgpt.com/aip/g-${state}/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+      return res.redirect(callbackUrl);
     }
 
+    // Fallback for direct browser testing (no state from ChatGPT)
     res.send(`
       <!DOCTYPE html>
       <html>
