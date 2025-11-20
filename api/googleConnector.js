@@ -16,7 +16,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { command, parameters = {} } = req.body;
+    // Get command from either URL path or request body
+    const pathMatch = req.url?.match(/\/api\/googleConnector\/([^?]+)/);
+    const commandFromPath = pathMatch ? pathMatch[1] : null;
+    const { command: commandFromBody, parameters = {} } = req.body || {};
+    
+    const command = commandFromPath || commandFromBody;
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
